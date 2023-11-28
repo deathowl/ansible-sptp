@@ -1,0 +1,15 @@
+[Unit]
+Description=sptp PTP client
+Wants=network-online.target
+After=network-online.target
+Wants = time-sync.target
+After = time-sync.target
+Conflicts=shutdown.target
+
+[Service]
+ExecStart=/usr/local/bin/sptp-exporter -exporterport {{prometheus_exporter_port}} -interval 10s -monitoringport {{metrics_port}}
+Restart=always
+Nice = -20
+
+[Install]
+WantedBy=multi-user.target

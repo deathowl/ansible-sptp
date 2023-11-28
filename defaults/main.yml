@@ -1,0 +1,9 @@
+---
+# defaults file for sptp
+sptp_version: "main"
+metrics_port: 4269
+gms: []
+iface: enp101s0np0
+dscp: 35
+prometheus_exporter: False
+prometheus_exporter_port: 6942

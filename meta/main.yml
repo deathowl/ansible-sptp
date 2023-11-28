@@ -1,0 +1,12 @@
+galaxy_info:
+  author: "Balint Csergo"
+  description: "SPTP PTP Client"
+  company: "Meta"
+
+  license: "Apache"
+
+  min_ansible_version: 2.1
+
+  galaxy_tags: ["sptp", "ptp", "metrics"]
+
+dependencies: []

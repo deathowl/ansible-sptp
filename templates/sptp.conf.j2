@@ -1,0 +1,24 @@
+iface: {{iface}}
+interval: 1s
+exchangetimeout: 100ms
+timestamping: hardware
+freerunning: false
+monitoringport: {{metrics_port}}
+dscp: {{dscp}}
+firststepthreshold: 1s
+metricsaggregationwindow: 60s
+attemptstxts: 100
+timeouttxts: 1ms
+servers:
+{% for gm in gms %}
+    "{{ gm }}": {{loop.index}}
+{% endfor %}
+measurement:
+  path_delay_filter_length: 59
+  path_delay_filter: "median"
+  path_delay_discard_filter_enabled: true
+  path_delay_discard_below: 2us
+backoff:
+  mode: "linear"
+  step: 10
+  maxvalue: 60

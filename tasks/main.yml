@@ -1,0 +1,72 @@
+---
+- name: Install go
+  become: true
+  ansible.builtin.package:
+    name: golang
+    state: present
+
+- name: Ensure sptp is installed
+  become: true
+  ansible.builtin.command:
+    cmd: /usr/bin/go install github.com/facebook/time/cmd/sptp@{{sptp_version}}
+    creates: /usr/local/bin/sptp
+  environment:
+    GOBIN: /usr/local/bin/
+
+- name: Copy the sptp systemd service file
+  template:
+    src: sptp.service.j2
+    dest: /etc/systemd/system/sptp.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart sptp
+
+- name: Create sptp config
+  ansible.builtin.template:
+      src: templates/sptp.conf.j2
+      dest: /etc/sptp.conf
+  notify: restart sptp
+
+- name: Ensure sptp is enabled on boot
+  become: true
+  systemd:
+    daemon_reload: true
+    name: sptp
+    enabled: true
+    state: started
+  when:
+    - not ansible_check_mode
+
+- name: Ensure sptp-exporter is installed
+  become: true
+  ansible.builtin.command:
+    cmd: /usr/bin/go install github.com/facebook/time/cmd/sptp-exporter@{{sptp_version}}
+    creates: /usr/local/bin/sptp-exporter
+  environment:
+    GOBIN: /usr/local/bin/
+  when:
+  - not ansible_check_mode
+  - prometheus_exporter
+
+- name: Copy the sptp-exporter systemd service file
+  template:
+    src: sptp_exporter.service.j2
+    dest: /etc/systemd/system/sptp_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  when:
+  - not ansible_check_mode
+  - prometheus_exporter
+
+- name: Ensure sptp_exporter is enabled on boot
+  become: true
+  systemd:
+    daemon_reload: true
+    name: sptp_exporter
+    enabled: true
+    state: started
+  when:
+    - not ansible_check_mode
+    - prometheus_exporter
